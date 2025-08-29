@@ -555,6 +555,10 @@ body {
     gap: 20px;
 }
 
+.auth-form .form-group input[type="checkbox"] {
+    width: auto;
+}
+
 .listing-form {
     display: grid;
     gap: 20px;
@@ -677,6 +681,33 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Toasts */
+.toast-container {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4000;
+}
+
+.toast {
+    background: #1f2937;
+    color: var(--text);
+    border-left: 4px solid var(--primary);
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    min-width: 260px;
+    animation: toastIn 300ms ease-out;
+}
+
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+
+@keyframes toastIn { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 /* Pagination */
 .pagination {

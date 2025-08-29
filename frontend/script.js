@@ -79,6 +79,18 @@ function setupEventListeners() {
         }
     });
 
+    // Show password toggles
+    const loginShow = document.getElementById('login-show-password');
+    if (loginShow) loginShow.addEventListener('change', () => {
+        const input = document.getElementById('login-password');
+        if (input) input.type = loginShow.checked ? 'text' : 'password';
+    });
+    const signupShow = document.getElementById('signup-show-password');
+    if (signupShow) signupShow.addEventListener('change', () => {
+        const input = document.getElementById('signup-password');
+        if (input) input.type = signupShow.checked ? 'text' : 'password';
+    });
+
     // Verification forms
     document.getElementById('verification-request-form').addEventListener('submit', handleVerificationRequest);
     document.getElementById('verification-otp-form').addEventListener('submit', handleVerificationOTP);
@@ -608,7 +620,7 @@ function displayUserProfile(profile) {
     
     // Update profile picture
     if (profile.profile_picture) {
-        document.getElementById('profile-picture').src = profile.profile_picture;
+        setProfileImage(profile.profile_picture);
     }
     
     // Fill form fields
@@ -672,7 +684,7 @@ async function handleProfilePictureUpload(e) {
 
         if (response.ok) {
             const profile = await response.json();
-            document.getElementById('profile-picture').src = profile.profile_picture;
+            setProfileImage(profile.profile_picture);
             showSuccess('Profile picture updated!');
         } else {
             showError('Failed to update profile picture');
@@ -937,8 +949,7 @@ function hideLoading() {
 }
 
 function showSuccess(message) {
-    // Simple success message - you can enhance this with a proper toast library
-    alert('Success: ' + message);
+    pushToast(message, 'success');
 }
 
 function normalizeErrorMessage(errorLike) {
@@ -954,8 +965,61 @@ function normalizeErrorMessage(errorLike) {
 }
 
 function showError(messageOrObject) {
-    // Simple error message - you can enhance this with a proper toast library
-    alert('Error: ' + normalizeErrorMessage(messageOrObject));
+    pushToast(normalizeErrorMessage(messageOrObject), 'error');
+}
+
+// Resolve media URL to absolute (handles local storage backend)
+function resolveMediaUrl(url) {
+    if (!url) return url;
+    // Clean up accidental prefixes/suffixes like leading '@' or quotes
+    let cleaned = String(url).trim();
+    cleaned = cleaned.replace(/^@+/, '');
+    cleaned = cleaned.replace(/^\"|^\'|\"$|\'$/g, '');
+    url = cleaned;
+    // If already absolute (http/https/data), return as-is
+    if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:')) return url;
+    // If backend serves from /uploads, ensure absolute to same host:port as backend
+    if (url.startsWith('/')) {
+        const base = API_BASE_URL.replace(/\/api\/v1$/, '');
+        return base + url;
+    }
+    // Otherwise treat as relative path under backend root
+    const base = API_BASE_URL.replace(/\/api\/v1$/, '');
+    return base + '/' + url.replace(/^\/+/, '');
+}
+
+function setProfileImage(url) {
+    const img = document.getElementById('profile-picture');
+    if (!img) return;
+    const finalUrl = resolveMediaUrl(url);
+    // Avoid cache-busting on public S3 URLs that may be signed/policy-controlled
+    const shouldBust = !/amazonaws\.com/i.test(finalUrl);
+    const withCache = shouldBust ? finalUrl + (finalUrl.includes('?') ? '&' : '?') + 't=' + Date.now() : finalUrl;
+
+    const pre = new Image();
+    pre.onload = function() {
+        img.src = withCache;
+        img.title = finalUrl;
+    };
+    pre.onerror = function() {
+        pushToast('Could not load profile image. Showing placeholder.', 'error');
+        img.src = 'https://via.placeholder.com/150?text=Profile';
+        img.title = 'Image failed to load: ' + finalUrl;
+    };
+    pre.src = withCache;
+}
+
+// Toasts
+function pushToast(text, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return alert(text);
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = text;
+    container.appendChild(el);
+    setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+    }, 4000);
 }
 
 function checkAuthStatus() {
@@ -1031,15 +1095,21 @@ function beginChatForListing(listing) {
 
 function connectListingChat(listingId, peerId) {
     if (websocket) try { websocket.close(); } catch(_){}
-    const url = `ws://localhost:8000/api/v1/chat/${listingId}/${peerId}`;
-    websocket = new WebSocket(url, []);
+    const url = `ws://localhost:8000/api/v1/chat/${listingId}/${peerId}?token=${encodeURIComponent(currentToken)}`;
+    websocket = new WebSocket(url);
     websocket.onopen = () => {
-        // Send token via header is not possible from browser; server expects Authorization header.
-        // Workaround: immediately close and reopen via subprotocol not supported; so we add token in first message.
-        // However, this backend authenticates via Authorization header on websocket handshake.
-        // To satisfy it, we must set it via query param and modify backend, which we can't.
-        // So fallback: use existing /chat/ws/{room_id} route if present. Otherwise we keep this for future.
+        // connection established; server created/fetched the room automatically
     };
+    websocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.error) {
+            showError(data.error);
+            return;
+        }
+        addMessageToChat(data);
+        document.getElementById('chat-input-container').style.display = 'flex';
+    };
+    websocket.onerror = function(error) { console.error('WS error', error); };
 }
 
 async function loadUserListings() {

@@ -340,7 +340,10 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" id="login-password" required>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;">
+                        <input type="checkbox" id="login-show-password"> Show password
+                    </label>
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
@@ -368,7 +371,10 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" id="signup-password" required>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;">
+                        <input type="checkbox" id="signup-show-password"> Show password
+                    </label>
                 </div>
                 <button type="submit" class="btn btn-primary">Sign Up</button>
             </form>
@@ -440,6 +446,9 @@
     <div id="loading-overlay" class="loading-overlay">
         <div class="spinner"></div>
     </div>
+
+    <!-- Toasts -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="script.js"></script>
 </body>
