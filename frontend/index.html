@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Exchange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-exchange-alt"></i> Campus Exchange</h2>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#listings" class="nav-link">Listings</a>
+                <a href="#search" class="nav-link">Search</a>
+                <a href="#chat" class="nav-link">Chat</a>
+                <a href="#profile" class="nav-link" id="profile-link" style="display: none;">Profile</a>
+                <div class="nav-auth" id="nav-auth">
+                    <button class="btn btn-primary" onclick="showAuthModal()">Login</button>
+                    <button class="btn btn-secondary" onclick="showSignupModal()">Sign Up</button>
+                </div>
+                <div class="nav-user" id="nav-user" style="display: none;">
+                    <div class="user-menu">
+                        <button class="btn btn-icon" onclick="toggleNotifications()">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                        </button>
+                        <button class="btn btn-icon" onclick="toggleUserMenu()">
+                            <i class="fas fa-user"></i>
+                        </button>
+                                        <div class="user-dropdown" id="user-dropdown" style="display: none;">
+                    <a href="#profile">My Profile</a>
+                    <a href="#favorites">My Favorites</a>
+                    <a href="#my-listings">My Listings</a>
+                    <a href="#verification" id="verification-link" style="display: none;">Verification</a>
+                    <a href="#admin" id="admin-link" style="display: none;">Admin Panel</a>
+                    <a href="#" onclick="logout()">Logout</a>
+                </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Welcome to Campus Exchange</h1>
+                    <p>Buy, sell, and trade items with your fellow students</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="showSection('listings')">Browse Listings</button>
+                        <button class="btn btn-secondary" onclick="showCreateListingModal()">Create Listing</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-search"></i>
+                    <h3>Search & Filter</h3>
+                    <p>Find exactly what you're looking for with advanced search</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Chat System</h3>
+                    <p>Connect with buyers and sellers directly</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-heart"></i>
+                    <h3>Favorites</h3>
+                    <p>Save items you're interested in</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Listings Section -->
+        <section id="listings" class="section">
+            <div class="section-header">
+                <h2>All Listings</h2>
+                <button class="btn btn-primary" onclick="showCreateListingModal()">
+                    <i class="fas fa-plus"></i> Create Listing
+                </button>
+            </div>
+            <div class="listings-grid" id="listings-grid">
+                <!-- Listings will be loaded here -->
+            </div>
+            <div class="pagination" id="listings-pagination">
+                <!-- Pagination will be added here -->
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="section">
+            <div class="search-container">
+                <div class="search-filters">
+                    <input type="text" id="search-query" placeholder="Search listings..." class="search-input">
+                    <select id="search-category" class="search-select">
+                        <option value="">All Categories</option>
+                        <option value="books">Books</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="sports">Sports</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="price-range">
+                        <input type="number" id="min-price" placeholder="Min Price" class="price-input">
+                        <input type="number" id="max-price" placeholder="Max Price" class="price-input">
+                    </div>
+                    <button class="btn btn-primary" onclick="searchListings()">Search</button>
+                </div>
+                <div class="search-results" id="search-results">
+                    <!-- Search results will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section id="chat" class="section">
+            <div class="chat-container">
+                <div class="chat-sidebar">
+                    <h3>Chat Rooms</h3>
+                    <div class="chat-rooms" id="chat-rooms">
+                        <!-- Chat rooms will be loaded here -->
+                    </div>
+                </div>
+                <div class="chat-main">
+                    <div class="chat-header" id="chat-header">
+                        <h3>Select a chat room to start messaging</h3>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <div class="chat-input-container" id="chat-input-container" style="display: none;">
+                        <input type="text" id="chat-input" placeholder="Type your message..." class="chat-input">
+                        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <img id="profile-picture" src="https://via.placeholder.com/150" alt="Profile Picture">
+                        <button class="btn btn-secondary" onclick="document.getElementById('profile-picture-input').click()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Loading...</h2>
+                        <p id="profile-email">Loading...</p>
+                        <p id="profile-university">Loading...</p>
+                    </div>
+                </div>
+                
+                <div class="profile-tabs">
+                    <button class="tab-btn active" onclick="showProfileTab('info')">Profile Info</button>
+                    <button class="tab-btn" onclick="showProfileTab('listings')">My Listings</button>
+                    <button class="tab-btn" onclick="showProfileTab('favorites')">My Favorites</button>
+                </div>
+                
+                <div class="profile-content">
+                    <div id="profile-info-tab" class="tab-content active">
+                        <form id="profile-form" class="profile-form">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="profile-full-name" name="full_name">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="profile-phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label>University</label>
+                                <input type="text" id="profile-university-input" name="university_name">
+                            </div>
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" id="profile-student-id" name="student_id">
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <input type="text" id="profile-department" name="department">
+                            </div>
+                            <div class="form-group">
+                                <label>Year of Study</label>
+                                <input type="number" id="profile-year" name="year_of_study" min="1" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label>WhatsApp Number</label>
+                                <input type="tel" id="profile-whatsapp" name="whatsapp_number">
+                            </div>
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea id="profile-bio" name="bio" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                    
+                    <div id="profile-listings-tab" class="tab-content">
+                        <div class="my-listings" id="my-listings">
+                            <!-- User's listings will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="profile-favorites-tab" class="tab-content">
+                        <div class="my-favorites" id="my-favorites">
+                            <!-- User's favorites will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Verification Section -->
+        <section id="verification" class="section">
+            <div class="verification-container">
+                <h2>Account Verification</h2>
+                <div class="verification-status" id="verification-status">
+                    <!-- Verification status will be loaded here -->
+                </div>
+                
+                <div class="verification-steps">
+                    <div class="step" id="step-1">
+                        <h3>Step 1: Request Verification</h3>
+                        <form id="verification-request-form" class="verification-form">
+                            <div class="form-group">
+                                <label>University Email</label>
+                                <input type="email" name="university_email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" name="student_id" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Request OTP</button>
+                        </form>
+                    </div>
+                    
+                    <div class="step" id="step-2" style="display: none;">
+                        <h3>Step 2: Verify OTP</h3>
+                        <form id="verification-otp-form" class="verification-form">
+                            <div class="form-group">
+                                <label>OTP Code</label>
+                                <input type="text" name="otp_code" required maxlength="6">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Verify OTP</button>
+                        </form>
+                    </div>
+                    
+                    <div class="step" id="step-3" style="display: none;">
+                        <h3>Step 3: Upload ID Document</h3>
+                        <form id="verification-upload-form" class="verification-form">
+                            <div class="form-group">
+                                <label>ID Document</label>
+                                <input type="file" name="id_document" accept="image/*,.pdf" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Upload ID</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin" class="section">
+            <div class="admin-container">
+                <h2>Admin Panel</h2>
+                
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="showAdminTab('dashboard')">Dashboard</button>
+                    <button class="tab-btn" onclick="showAdminTab('users')">Users</button>
+                    <button class="tab-btn" onclick="showAdminTab('listings')">Listings</button>
+                    <button class="tab-btn" onclick="showAdminTab('reports')">Reports</button>
+                    <button class="tab-btn" onclick="showAdminTab('verifications')">Verifications</button>
+                </div>
+                
+                <div class="admin-content">
+                    <div id="admin-dashboard-tab" class="tab-content active">
+                        <div class="admin-stats" id="admin-stats">
+                            <!-- Admin stats will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="admin-users-tab" class="tab-content">
+                        <div class="admin-users" id="admin-users">
+                            <!-- Users management will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="admin-listings-tab" class="tab-content">
+                        <div class="admin-listings" id="admin-listings">
+                            <!-- Listings management will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="admin-reports-tab" class="tab-content">
+                        <div class="admin-reports" id="admin-reports">
+                            <!-- Reports management will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="admin-verifications-tab" class="tab-content">
+                        <div class="admin-verifications" id="admin-verifications">
+                            <!-- Verifications management will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('auth-modal')">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="showSignupModal()">Sign up</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signup-modal')">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>University</label>
+                    <input type="text" name="university_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </form>
+            <p>Already have an account? <a href="#" onclick="showAuthModal()">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Create Listing Modal -->
+    <div id="create-listing-modal" class="modal">
+        <div class="modal-content large">
+            <span class="close" onclick="closeModal('create-listing-modal')">&times;</span>
+            <h2>Create New Listing</h2>
+            <form id="create-listing-form" class="listing-form">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="books">Books</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="sports">Sports</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" name="price" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Images</label>
+                    <input type="file" name="images" multiple accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Listing</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Listing Detail Modal -->
+    <div id="listing-detail-modal" class="modal">
+        <div class="modal-content large glass">
+            <span class="close" onclick="closeModal('listing-detail-modal')">&times;</span>
+            <div class="listing-detail" id="listing-detail">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="notifications-panel">
+        <div class="notifications-header">
+            <h3>Notifications</h3>
+            <button class="btn btn-small" onclick="markAllNotificationsRead()">Mark All Read</button>
+        </div>
+        <div class="notifications-list" id="notifications-list">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
