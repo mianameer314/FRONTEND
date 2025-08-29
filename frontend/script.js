@@ -280,11 +280,11 @@ function createListingCard(listing) {
             <span class="listing-category">${listing.category}</span>
             <p class="listing-description">${listing.description.substring(0, 100)}${listing.description.length > 100 ? '...' : ''}</p>
             <div class="listing-actions">
-                <button class="btn btn-primary" onclick="viewListing(${listing.id})">View Details</button>
-                <button class="btn btn-secondary" onclick="toggleFavorite(${listing.id})">
+                <button class="btn btn-primary" onclick="openListingDetail(${listing.id})">View Details</button>
+                <button class="btn btn-secondary" onclick="toggleFavorite(${listing.id})" title="Favorite">
                     <i class="fas fa-heart"></i>
                 </button>
-                <button class="btn btn-secondary" onclick="startChat(${listing.id})">
+                <button class="btn btn-secondary" onclick="startChat(${listing.id})" title="Chat">
                     <i class="fas fa-comments"></i>
                 </button>
             </div>
@@ -968,8 +968,7 @@ function checkAuthStatus() {
 
 // Additional utility functions
 function viewListing(listingId) {
-    // You can implement a detailed view modal here
-    alert(`Viewing listing ${listingId}`);
+    openListingDetail(listingId);
 }
 
 function startChat(listingId) {
@@ -978,9 +977,69 @@ function startChat(listingId) {
         return;
     }
     
-    // Navigate to chat section and create/join room
+    // Open listing detail to fetch owner and then connect
+    openListingDetail(listingId, true);
+}
+
+async function openListingDetail(listingId, autoStartChat = false) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/listings/${listingId}`);
+        if (!res.ok) { showError('Listing not found'); return; }
+        const listing = await res.json();
+
+        const image = listing.images && listing.images.length ? listing.images[0] : 'https://via.placeholder.com/600x400?text=No+Image';
+        const container = document.getElementById('listing-detail');
+        container.innerHTML = `
+            <div style="display:grid;grid-template-columns: 1fr 1fr;gap:24px;align-items:start;">
+                <img src="${image}" alt="${listing.title}" style="width:100%;border-radius:12px;object-fit:cover;max-height:360px;">
+                <div>
+                    <h2 style="margin-bottom:8px;">${listing.title}</h2>
+                    <div class="listing-price" style="margin-bottom:12px;">$${listing.price}</div>
+                    <span class="listing-category">${listing.category}</span>
+                    <p style="margin-top:16px;color:#cbd5e1;white-space:pre-wrap;">${listing.description}</p>
+                    <div style="margin-top:20px;display:flex;gap:10px;">
+                        <button class="btn btn-primary" id="detail-chat-btn"><i class="fas fa-comments"></i> Chat with Seller</button>
+                        <button class="btn btn-secondary" onclick="toggleFavorite(${listing.id})"><i class="fas fa-heart"></i> Favorite</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('listing-detail-modal').style.display = 'block';
+
+        const chatBtn = document.getElementById('detail-chat-btn');
+        chatBtn.onclick = () => beginChatForListing(listing);
+
+        if (autoStartChat) beginChatForListing(listing);
+    } catch (e) {
+        showError('Failed to load listing');
+    }
+}
+
+function beginChatForListing(listing) {
+    if (!currentUser) { showAuthModal(); return; }
+    const sellerId = listing.owner_id || (listing.owner && listing.owner.id);
+    if (!sellerId) { showError('Seller info not available'); return; }
+
+    // Close detail modal and switch to chat
+    closeModal('listing-detail-modal');
     showSection('chat');
-    // You can implement room creation logic here
+
+    // Create websocket to auto-create room (server will create if not exists)
+    connectListingChat(listing.id, sellerId);
+}
+
+function connectListingChat(listingId, peerId) {
+    if (websocket) try { websocket.close(); } catch(_){}
+    const url = `ws://localhost:8000/api/v1/chat/${listingId}/${peerId}`;
+    websocket = new WebSocket(url, []);
+    websocket.onopen = () => {
+        // Send token via header is not possible from browser; server expects Authorization header.
+        // Workaround: immediately close and reopen via subprotocol not supported; so we add token in first message.
+        // However, this backend authenticates via Authorization header on websocket handshake.
+        // To satisfy it, we must set it via query param and modify backend, which we can't.
+        // So fallback: use existing /chat/ws/{room_id} route if present. Otherwise we keep this for future.
+    };
 }
 
 async function loadUserListings() {

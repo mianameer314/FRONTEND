@@ -5,17 +5,34 @@
     box-sizing: border-box;
 }
 
+:root {
+    --bg: #0f1115;
+    --bg-elev: #151922;
+    --card: #1b2130;
+    --text: #e6e9ef;
+    --muted: #9aa4b2;
+    --primary: #6ea8fe;
+    --primary-700: #4d7bd6;
+    --accent: #22d3ee;
+    --danger: #ef4444;
+    --success: #10b981;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f8f9fa;
+    color: var(--text);
+    background: radial-gradient(1200px 800px at 20% -10%, rgba(34,211,238,0.12), transparent 60%),
+               radial-gradient(1000px 600px at 100% 0%, rgba(110,168,254,0.18), transparent 50%),
+               var(--bg);
+    background-attachment: fixed;
 }
 
 /* Navigation */
 .navbar {
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: rgba(21, 25, 34, 0.75);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     position: fixed;
     top: 0;
     width: 100%;
@@ -33,7 +50,7 @@ body {
 }
 
 .nav-logo h2 {
-    color: #007bff;
+    color: var(--primary);
     font-size: 1.5rem;
 }
 
@@ -45,7 +62,7 @@ body {
 
 .nav-link {
     text-decoration: none;
-    color: #333;
+    color: var(--text);
     padding: 10px 15px;
     border-radius: 5px;
     transition: all 0.3s ease;
@@ -53,8 +70,8 @@ body {
 
 .nav-link:hover,
 .nav-link.active {
-    background: #007bff;
-    color: white;
+    background: var(--primary-700);
+    color: var(--text);
 }
 
 .nav-toggle {
@@ -84,21 +101,22 @@ body {
 }
 
 .btn-primary {
-    background: #007bff;
-    color: white;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #0b1020;
+    box-shadow: 0 10px 25px rgba(110,168,254,0.25);
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    filter: brightness(0.95);
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: #2a3244;
+    color: var(--text);
 }
 
 .btn-secondary:hover {
-    background: #545b62;
+    background: #3a445a;
 }
 
 .btn-icon {
@@ -142,13 +160,28 @@ body {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: radial-gradient(600px 300px at 10% 0%, rgba(34,211,238,0.2), transparent),
+                linear-gradient(135deg, #0b1020, #151922);
+    color: var(--text);
     padding: 80px 20px;
     text-align: center;
     border-radius: 10px;
     margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
 }
+
+.hero::after {
+    content: "";
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(110,168,254,0.35), transparent 60%);
+    filter: blur(10px);
+    animation: float 10s ease-in-out infinite;
+}
+
+@keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(20px)} 100%{transform:translateY(0)} }
 
 .hero h1 {
     font-size: 3rem;
@@ -177,27 +210,27 @@ body {
 }
 
 .feature-card {
-    background: white;
+    background: var(--card);
     padding: 30px;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     transition: transform 0.3s ease;
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px) scale(1.01);
 }
 
 .feature-card i {
     font-size: 3rem;
-    color: #007bff;
+    color: var(--primary);
     margin-bottom: 20px;
 }
 
 .feature-card h3 {
     margin-bottom: 15px;
-    color: #333;
+    color: var(--text);
 }
 
 /* Listings Grid */
@@ -209,15 +242,16 @@ body {
 }
 
 .listing-card {
-    background: white;
+    background: linear-gradient(180deg, rgba(34,41,59,0.85), rgba(23,28,41,0.95));
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .listing-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
 }
 
 .listing-image {
@@ -233,19 +267,19 @@ body {
 .listing-title {
     font-size: 1.2rem;
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text);
 }
 
 .listing-price {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #007bff;
+    color: var(--accent);
     margin-bottom: 10px;
 }
 
 .listing-category {
-    background: #e9ecef;
-    color: #495057;
+    background: #253046;
+    color: var(--muted);
     padding: 5px 10px;
     border-radius: 15px;
     font-size: 12px;
@@ -266,10 +300,10 @@ body {
 
 /* Search Section */
 .search-container {
-    background: white;
+    background: var(--card);
     border-radius: 10px;
     padding: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .search-filters {
@@ -300,14 +334,14 @@ body {
     grid-template-columns: 300px 1fr;
     gap: 20px;
     height: 600px;
-    background: white;
+    background: var(--card);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .chat-sidebar {
-    background: #f8f9fa;
+    background: #141925;
     padding: 20px;
     border-right: 1px solid #ddd;
 }
@@ -337,8 +371,8 @@ body {
 
 .chat-header {
     padding: 20px;
-    border-bottom: 1px solid #ddd;
-    background: #f8f9fa;
+    border-bottom: 1px solid #2b3244;
+    background: #151b28;
 }
 
 .chat-messages {
@@ -355,14 +389,14 @@ body {
 }
 
 .message.sent {
-    background: #007bff;
-    color: white;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #0b1020;
     margin-left: auto;
 }
 
 .message.received {
-    background: #e9ecef;
-    color: #333;
+    background: #232c42;
+    color: var(--text);
 }
 
 .chat-input-container {
@@ -381,10 +415,10 @@ body {
 
 /* Profile Section */
 .profile-container {
-    background: white;
+    background: var(--card);
     border-radius: 10px;
     padding: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .profile-header {
@@ -483,13 +517,19 @@ body {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: var(--card);
     margin: 5% auto;
     padding: 30px;
     border-radius: 10px;
     width: 90%;
     max-width: 500px;
     position: relative;
+}
+
+.modal-content.glass {
+    background: rgba(27, 33, 48, 0.6);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .modal-content.large {
@@ -527,7 +567,7 @@ body {
     right: -400px;
     width: 400px;
     height: calc(100vh - 70px);
-    background: white;
+    background: var(--card);
     box-shadow: -5px 0 15px rgba(0,0,0,0.1);
     transition: right 0.3s ease;
     z-index: 1001;
